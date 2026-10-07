@@ -1,0 +1,13 @@
+initial_intent,ttfv_group,d30_observed,d30_value
+analyze,same day,553,0.23
+analyze,later,205,0.185
+ask,same day,997,0.201
+ask,later,205,0.176
+create,same day,1600,0.202
+create,later,503,0.249
+funding,same day,2921,0.149
+funding,later,1149,0.107
+presence,same day,763,0.178
+presence,later,210,0.186
+start,same day,727,0.111
+start,later,110,0.182

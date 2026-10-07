@@ -1,0 +1,7 @@
+initial_intent,users_with_events,started,got_output,got_value,output_given_start,value_given_output
+analyze,1619,1406.0,1342.0,785.0,0.954,0.585
+ask,1944,1711.0,1709.0,1007.0,0.999,0.589
+create,4006,3390.0,3384.0,2127.0,0.998,0.629
+funding,6226,5439.0,4502.0,3992.0,0.828,0.887
+presence,2263,1742.0,1732.0,1066.0,0.994,0.615
+start,1572,1377.0,1374.0,914.0,0.998,0.665

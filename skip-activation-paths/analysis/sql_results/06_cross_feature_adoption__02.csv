@@ -1,0 +1,5 @@
+day0_engagement,breadth,d30_observed,d30_value
+day0: 1 session,1 feature,4815,0.088
+day0: 1 session,2+ features,1620,0.219
+day0: 2+ sessions,1 feature,1351,0.127
+day0: 2+ sessions,2+ features,1372,0.424

@@ -1,0 +1,7 @@
+inferred_intent,users_who_declared,agreement_rate
+analyze,1049,0.923
+ask,1269,0.901
+create,2644,0.902
+funding,4016,0.901
+presence,1472,0.899
+start,1044,0.895

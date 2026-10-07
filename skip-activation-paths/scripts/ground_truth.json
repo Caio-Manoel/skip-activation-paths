@@ -1,0 +1,19 @@
+{
+  "seed": 20261007,
+  "causal_effects_logit": {
+    "value_reached_by_intent": {
+      "funding": 0.35,
+      "create": 1.1,
+      "analyze": 0.9,
+      "ask": 1.0,
+      "presence": 0.7,
+      "start": 0.4
+    },
+    "cross_feature_value": 0.12,
+    "incentive_completion": 0.0,
+    "analyze_to_cofounder_bridge": 0.25,
+    "time_to_first_value": 0.0,
+    "drawing_day_boost": 3.4
+  },
+  "note": "Synthetic ground truth. Used only to check whether the analysis recovers it."
+}

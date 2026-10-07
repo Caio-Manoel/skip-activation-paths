@@ -1,0 +1,3 @@
+check_name,orphans
+artifact_saved without artifact_generated (same output_id),0
+analysis_recommendation_clicked without analysis_completed (same output_id),138

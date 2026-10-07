@@ -1,0 +1,228 @@
+<title>Skip Activation Paths</title>
+<meta name="description" content="Exploratory case study on Skip's activation paths by user intent, using synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one scrolling argument in seven lettered steps (A–G), each a claim followed by its evidence; a slim index rail on wide screens. */
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --ink:#15202b; --muted:#5b6b78; --line:#dde3e8;
+  --accent:#0f6e6e; --accent-soft:#d8eeec; --warn:#b4540a; --warn-soft:#fdf0e3;
+  --obs:#2f5fb3; --obs-soft:#e3ebfa; --exp:#7a3fb8; --exp-soft:#efe5fa; --rec:#0f6e6e; --rec-soft:#d8eeec;
+  --faint:#c9d2da;
+  --i-funding:#2f6fd6; --i-create:#d48a00; --i-analyze:#14946b; --i-ask:#7c4fd1; --i-presence:#d14b4b; --i-start:#5f7383;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f161c; --surface:#16212a; --ink:#e6edf2; --muted:#93a4b2; --line:#26343f;
+  --accent:#4fc2b8; --accent-soft:#163a39; --warn:#f0a35a; --warn-soft:#3a2a17;
+  --obs:#8fb2f5; --obs-soft:#1b2a44; --exp:#c9a3f5; --exp-soft:#2c1f3d; --rec:#4fc2b8; --rec-soft:#163a39;
+  --faint:#3a4a57;
+  --i-funding:#6ea0ff; --i-create:#f0b43c; --i-analyze:#45c99a; --i-ask:#a98cff; --i-presence:#ff8080; --i-start:#9fb2c1;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161c; --surface:#16212a; --ink:#e6edf2; --muted:#93a4b2; --line:#26343f;
+  --accent:#4fc2b8; --accent-soft:#163a39; --warn:#f0a35a; --warn-soft:#3a2a17;
+  --obs:#8fb2f5; --obs-soft:#1b2a44; --exp:#c9a3f5; --exp-soft:#2c1f3d; --rec:#4fc2b8; --rec-soft:#163a39;
+  --faint:#3a4a57;
+  --i-funding:#6ea0ff; --i-create:#f0b43c; --i-analyze:#45c99a; --i-ask:#a98cff; --i-presence:#ff8080; --i-start:#9fb2c1;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{display:grid;grid-template-columns:200px minmax(0,760px);gap:48px;justify-content:center;padding-inline:16px;padding-block:32px 80px}
+nav.idx{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;display:flex;flex-direction:column;gap:2px;font-size:13px}
+nav.idx a{color:var(--muted);text-decoration:none;padding:5px 8px;border-radius:6px;display:grid;grid-template-columns:18px 1fr;gap:6px}
+nav.idx a b{font:500 12px var(--f-mono);color:var(--accent)}
+nav.idx a:hover,nav.idx a:focus-visible{background:var(--surface);color:var(--ink);outline:none}
+main{min-width:0;display:flex;flex-direction:column;gap:56px}
+header.top{display:flex;flex-direction:column;gap:14px}
+.note{background:var(--warn-soft);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);padding:10px 14px;border-radius:8px;font-size:13.5px;line-height:1.5}
+.byline{font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.03em}
+.byline b{color:var(--ink);font-weight:500}
+h1{font:700 clamp(28px,4vw,40px)/1.1 var(--f-display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.lede{color:var(--muted);font-size:16px;max-width:64ch;margin:0}
+section.step{display:flex;flex-direction:column;gap:14px;scroll-margin-top:24px}
+.stephead{display:flex;gap:14px;align-items:baseline}
+.letter{font:700 15px var(--f-mono);color:var(--accent);min-width:18px}
+.kicker{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font:700 clamp(21px,2.6vw,26px)/1.2 var(--f-display);letter-spacing:-.01em;margin:2px 0 0;text-wrap:balance}
+.body{color:var(--ink);max-width:64ch;margin:0}
+.figure{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.takeaway{font-weight:600;font-size:15px;margin:0}
+.cap{font-size:12.5px;color:var(--muted);margin:0}
+.tag{align-self:flex-start;font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.tag.obs{background:var(--obs-soft);color:var(--obs)} .tag.exp{background:var(--exp-soft);color:var(--exp)} .tag.rec{background:var(--rec-soft);color:var(--rec)}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--muted);font:11.5px var(--f-mono)}
+svg text.strong{fill:var(--ink);font-weight:500}
+svg .grid{stroke:var(--line)} svg .zero{stroke:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.recs{display:grid;gap:12px;margin:0;padding:0;list-style:none;counter-reset:r}
+.recs li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:grid;grid-template-columns:28px 1fr;gap:4px 12px;counter-increment:r}
+.recs li::before{content:counter(r);font:700 18px/1.2 var(--f-display);color:var(--accent);grid-row:span 2}
+.recs h3{margin:0;font:600 15.5px/1.35 var(--f-body)}
+.recs p{margin:0;color:var(--muted);font-size:13.5px}
+.recs p a{color:var(--accent)}
+footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)} nav.idx{display:none}}
+</style>
+
+<div class="wrap">
+  <nav class="idx" aria-label="Sections">
+    <a href="#A"><b>A</b>Activation by intent</a>
+    <a href="#B"><b>B</b>Outcome vs exploration</a>
+    <a href="#C"><b>C</b>Cross-feature retention</a>
+    <a href="#D"><b>D</b>Why it misleads</a>
+    <a href="#E"><b>E</b>Simulated experiment</a>
+    <a href="#F"><b>F</b>Acquisition mix</a>
+    <a href="#G"><b>G</b>Recommendations</a>
+  </nav>
+  <main id="main"></main>
+</div>
+
+<script src="data.js"></script>
+<script>
+const D = window.SKIP_DATA;
+const INTENTS = ["funding","create","analyze","ask","presence","start"];
+const LABEL = {funding:"Funding",create:"Create content",analyze:"Analyze",ask:"Ask Cofounder",presence:"Online presence",start:"Start a business"};
+const col = k => `var(--i-${k})`;
+const pct = (x,d=1) => (x*100).toFixed(d)+"%";
+const pp = x => (x>=0?"+":"−")+Math.abs(x*100).toFixed(1)+" pp";
+const fmt = n => Number(n).toLocaleString("en-US");
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+/* Horizontal bar chart. rows: [{label, value, color, note, lo, hi}] ; domain [min,max] */
+function hbars(rows,{min=0,max,fmtV=v=>pct(v),labelW=150,w=720,rowH=34,ticks=[]}={}){
+  max = max ?? Math.max(...rows.map(r=>r.hi ?? r.value))*1.12;
+  const m={l:labelW,r:70,t:8,b:ticks.length?24:6}, iw=w-m.l-m.r, h=m.t+m.b+rows.length*rowH;
+  const x=v=>m.l+(v-min)/(max-min)*iw;
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img">`;
+  ticks.forEach(t=>{s+=`<line class="grid" x1="${x(t)}" x2="${x(t)}" y1="${m.t}" y2="${h-m.b}"/><text x="${x(t)}" y="${h-6}" text-anchor="middle">${fmtV(t)}</text>`});
+  if(min<0) s+=`<line class="zero" x1="${x(0)}" x2="${x(0)}" y1="${m.t}" y2="${h-m.b}"/>`;
+  rows.forEach((r,i)=>{const y=m.t+i*rowH, bh=rowH*.56, by=y+(rowH-bh)/2;
+    const base=Math.max(min,0), x0=x(Math.min(base,r.value)), x1=x(Math.max(base,r.value));
+    s+=`<text class="strong" x="${m.l-10}" y="${y+rowH/2+4}" text-anchor="end">${esc(r.label)}</text>`;
+    s+=`<rect x="${x0}" y="${by}" width="${Math.max(x1-x0,1)}" height="${bh}" rx="3" fill="${r.color}"/>`;
+    if(r.lo!=null){s+=`<line x1="${x(r.lo)}" x2="${x(r.hi)}" y1="${y+rowH/2}" y2="${y+rowH/2}" stroke="var(--ink)" stroke-width="1.4"/><line x1="${x(r.lo)}" x2="${x(r.lo)}" y1="${y+rowH/2-5}" y2="${y+rowH/2+5}" stroke="var(--ink)"/><line x1="${x(r.hi)}" x2="${x(r.hi)}" y1="${y+rowH/2-5}" y2="${y+rowH/2+5}" stroke="var(--ink)"/>`}
+    const lx=Math.max(x1,r.hi!=null?x(r.hi):0)+8;
+    s+=`<text class="strong" x="${lx}" y="${y+rowH/2+4}">${fmtV(r.value)}</text>`;});
+  return s+"</svg>";
+}
+/* Paired horizontal bars: rows [{label,a,b}] */
+function pairs(rows,{max,labelW=150,w=720,ca="var(--accent)",cb="var(--faint)"}){
+  const rowH=44, m={l:labelW,r:60,t:6,b:6}, iw=w-m.l-m.r, h=m.t+m.b+rows.length*rowH, x=v=>m.l+v/max*iw;
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img">`;
+  rows.forEach((r,i)=>{const y=m.t+i*rowH;
+    s+=`<text class="strong" x="${m.l-10}" y="${y+rowH/2+4}" text-anchor="end">${esc(r.label)}</text>`;
+    s+=`<rect x="${m.l}" y="${y+6}" width="${x(r.a)-m.l}" height="14" rx="3" fill="${ca}"/><text x="${x(r.a)+6}" y="${y+17}" class="strong">${pct(r.a)}</text>`;
+    s+=`<rect x="${m.l}" y="${y+23}" width="${Math.max(x(r.b)-m.l,1)}" height="14" rx="3" fill="${cb}"/><text x="${x(r.b)+6}" y="${y+34}">${pct(r.b)}</text>`;});
+  return s+"</svg>";
+}
+/* Line chart over categorical x */
+function lines(series,xs,{min,max,step,w=720,h=280,fmtY=v=>pct(v,0)}){
+  const m={l:48,r:20,t:12,b:30}, iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const x=i=>m.l+i*iw/(xs.length-1), y=v=>m.t+ih-(v-min)/(max-min)*ih;
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img">`;
+  for(let t=min;t<=max+1e-9;t+=step){s+=`<line class="grid" x1="${m.l}" x2="${w-m.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${m.l-8}" y="${y(t)+4}" text-anchor="end">${fmtY(t)}</text>`}
+  xs.forEach((v,i)=>{s+=`<text x="${x(i)}" y="${h-8}" text-anchor="middle">${v}</text>`});
+  series.forEach(se=>{s+=`<polyline fill="none" stroke="${se.color}" stroke-width="${se.width||2.2}" stroke-dasharray="${se.dash||""}" points="${se.values.map((v,i)=>x(i)+","+y(v)).join(" ")}"/>`;
+    se.values.forEach((v,i)=>{s+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${se.color}"/>`});});
+  (series.shade||[]).forEach(()=>{});
+  return s+"</svg>";
+}
+const fig = (tag, takeaway, chart, cap, legend="") => `<div class="figure"><span class="tag ${tag[0]}">${tag[1]}</span><p class="takeaway">${takeaway}</p>${chart}${legend}${cap?`<p class="cap">${cap}</p>`:""}</div>`;
+const OBS=["obs","Simulation · observational"], EXP=["exp","Simulation · randomized experiment"], REC=["rec","Recommendation"];
+
+/* ---------- data ---------- */
+const BI = D.by_intent.slice().sort((a,b)=>b.activation_intent_7d-a.activation_intent_7d);
+const cand = {}; D.h1_candidates.forEach(c=>{(cand[c.intent]=cand[c.intent]||{})[c.candidate]=c});
+const aucOut = INTENTS.map(i=>cand[i]["Received an output"].auc), aucKeep = INTENTS.map(i=>cand[i]["Intent-specific FMO ≤7d"].auc);
+const H2=D.h2, H3=D.h3, SIM=D.simulated_experiment_b, FP=D.h5.funding_paths;
+const drawF = D.h5.drawing_day_share.find(r=>r.initial_intent==="funding").share_on_drawing_days;
+const drawO = D.h5.drawing_day_share.filter(r=>r.initial_intent!=="funding").map(r=>r.share_on_drawing_days);
+const MIX = D.cohort_mix_shift.filter(r=>r.week<"2026-07-27");
+const june = MIX.filter(r=>r.week<"2026-07-01"), jul = MIX.filter(r=>r.week==="2026-07-06"||r.week==="2026-07-13");
+const rng = (a,f=pct) => `${f(Math.min(...a))}–${f(Math.max(...a))}`;
+
+const html = `
+<header class="top">
+  <div class="note"><b>Exploratory case study using synthetic data.</b> Product observations are based on Skip's publicly available experience; no internal Skip data was used.</div>
+  <div class="byline"><b>Caio Manoel Almeida Souza</b> · Product / Data / Analytics</div>
+  <h1>Does Skip have one activation event, or does it depend on why the entrepreneur came?</h1>
+  <p class="lede">Skip's homepage offers Create, Analyze and Ask next to a live grants carousel. I wanted to know whether one activation metric can describe users who arrive for such different jobs. To pressure-test the hypotheses, I built a simulated dataset of ${fmt(D.kpis.users)} users where I control the true effects. Every number below comes from that simulation.</p>
+</header>
+
+<section class="step" id="A">
+  <div class="stephead"><span class="letter">A</span><div><div class="kicker">Activation by initial intent</div><h2>Activation looks different depending on why users came</h2></div></div>
+  ${fig(OBS, `Between ${pct(Math.min(...BI.map(r=>r.activation_intent_7d)),0)} and ${pct(Math.max(...BI.map(r=>r.activation_intent_7d)),0)} of users reach a meaningful outcome in their first week, depending on intent.`,
+    hbars(BI.map(r=>({label:r.label,value:r.activation_intent_7d,color:col(r.intent)})),{max:0.8,ticks:[0,.2,.4,.6,.8],fmtV:v=>pct(v,0)}),
+    `Activation = kept, used, published or submitted something Skip produced for the job they came for, within 7 days. n = ${fmt(D.kpis.users)} simulated signups.`)}
+  ${fig(OBS, `Getting an AI output barely separates retained users from churned ones; keeping or acting on it does, in every intent.`,
+    hbars(INTENTS.flatMap(i=>[{label:LABEL[i]+" · output",value:cand[i]["Received an output"].auc,color:"var(--faint)"},{label:"kept / acted",value:cand[i]["Intent-specific FMO ≤7d"].auc,color:col(i)}]),{min:0.5,max:0.8,labelW:190,rowH:26,ticks:[.5,.6,.7,.8],fmtV:v=>v.toFixed(2)}),
+    `How well each event predicts being value-active in week 5 (AUC; 0.50 = coin flip). Range: received output ${rng(aucOut,v=>v.toFixed(2))}, kept or acted ${rng(aucKeep,v=>v.toFixed(2))}.`)}
+  ${fig(OBS, `Funding users come back on drawing days: ${pct(drawF,0)} of their later active days are drawing days, versus ${rng(drawO,v=>pct(v,0))} for other intents.`,
+    hbars(D.h5.drawing_day_share.map(r=>({label:LABEL[r.initial_intent],value:r.share_on_drawing_days,color:col(r.initial_intent)})),{max:1,ticks:[0,.25,.5,.75,1],fmtV:v=>pct(v,0)}),
+    `Share of active days in weeks 2–5 that fall on live-drawing days; 29% if activity were spread evenly. The drawing calendar is my assumption, based on Skip's public grant terms.`)}
+</section>
+
+<section class="step" id="B">
+  <div class="stephead"><span class="letter">B</span><div><div class="kicker">Outcome completion vs exploration</div><h2>Reaching a meaningful outcome matters much more than exploring</h2></div></div>
+  ${fig(OBS, `Users who completed an outcome in week 1 were value-active in week 5 at ${pct(H2.raw.rate_with)}, versus ${pct(H2.raw.rate_without)} for users who only explored (${pp(H2.raw.diff)}, 95% CI ${pp(H2.raw.ci95[0])} to ${pp(H2.raw.ci95[1])}).`,
+    pairs(H2.within_intent.map(r=>({label:LABEL[r.intent],a:r.rate_with,b:r.rate_without})),{max:0.3}),
+    `n = ${fmt(H2.raw.n_with)} completed vs ${fmt(H2.raw.n_without)} explored-only (users who opened at least one feature in week 1). The gap appears in all six intents.`,
+    `<div class="legend"><span><span class="sw" style="background:var(--accent)"></span>Completed an outcome</span><span><span class="sw" style="background:var(--faint)"></span>Explored only</span></div>`)}
+</section>
+
+<section class="step" id="C">
+  <div class="stephead"><span class="letter">C</span><div><div class="kicker">Observational cross-feature retention</div><h2>Multi-feature users look far more retained</h2></div></div>
+  ${fig(OBS, `Activated users who got value from 2+ features in week 1 retained at ${pct(H3.raw.rate_with)}, versus ${pct(H3.raw.rate_without)} for single-feature users: about ${(H3.raw.rate_with/H3.raw.rate_without).toFixed(1)}× higher.`,
+    hbars([{label:"2+ features",value:H3.raw.rate_with,color:"var(--accent)"},{label:"1 feature",value:H3.raw.rate_without,color:"var(--faint)"}],{max:0.4,ticks:[0,.1,.2,.3,.4],fmtV:v=>pct(v,0)}),
+    `Week-5 value retention. n = ${fmt(H3.raw.n_with)} vs ${fmt(H3.raw.n_without)}. Taken at face value, this argues for pushing cross-sell. Section D tests that reading.`)}
+</section>
+
+<section class="step" id="D">
+  <div class="stephead"><span class="letter">D</span><div><div class="kicker">Why that correlation can mislead</div><h2>Most of that gap comes from who the users already are</h2></div></div>
+  <p class="body">In the simulation I know the true effect of breadth, and it is small. Engaged users simply do more of everything. Two checks show it from the data alone.</p>
+  ${fig(OBS, `Adding controls shrinks the effect (odds ratio ${H3.raw_or.odds_ratio.toFixed(2)} → ${H3.adj_with_engagement.odds_ratio.toFixed(2)}), yet a large gap remains while the true effect of breadth in the simulation is small. Observable controls only partly remove selection.`,
+    hbars([{label:"Raw",value:H3.raw_or.odds_ratio,color:"var(--faint)",lo:H3.raw_or.ci95[0],hi:H3.raw_or.ci95[1]},{label:"+ intent, channel, platform",value:H3.adj_pre_signup.odds_ratio,color:"var(--faint)",lo:H3.adj_pre_signup.ci95[0],hi:H3.adj_pre_signup.ci95[1]},{label:"+ day-0 engagement",value:H3.adj_with_engagement.odds_ratio,color:"var(--accent)",lo:H3.adj_with_engagement.ci95[0],hi:H3.adj_with_engagement.ci95[1]}],{max:5,labelW:200,ticks:[0,1,2,3,4,5],fmtV:v=>v.toFixed(1)}),
+    `Odds ratio for week-5 value retention, 2+ vs 1 feature, with 95% CIs. Multi-feature users were already more active on day 0, before breadth could matter (median ${H3.selection_check.day0_events_multi} vs ${H3.selection_check.day0_events_single} events).`)}
+  ${fig(OBS, `Funding users who completed a website or plan retained ${(FP[1].d30_value/FP[0].d30_value).toFixed(1)}× better than funding-only users, although those completions have no true effect in the simulation.`,
+    hbars(FP.map((r,i)=>({label:["Funding only","+ website / plan","+ AI tools"][i],value:r.d30_value,color:i===1?"var(--i-funding)":"var(--faint)"})),{max:0.5,labelW:160,ticks:[0,.1,.2,.3,.4,.5],fmtV:v=>pct(v,0)}),
+    `Week-5 value retention for activated funding users. Grant amounts depend on what the business has completed, so some breadth is incentive-driven. n = ${FP.map(r=>fmt(r.d30_observed)).join(" / ")}.`)}
+</section>
+
+<section class="step" id="E">
+  <div class="stephead"><span class="letter">E</span><div><div class="kicker">Simulated experiment: Analyze → Cofounder</div><h2>A +33 pp observed gap became about +3 pp when the bridge was randomized</h2></div></div>
+  <p class="body">I regenerated the simulation with users randomly assigned to be offered "Want Cofounder to turn this into an action plan?" after an analysis. That separates the effect of the bridge from the kind of user who takes it.</p>
+  ${fig(EXP, `The randomized effect across everyone offered the bridge was ${pp(SIM.itt_diff)} (95% CI ${pp(SIM.itt_ci95[0])} to ${pp(SIM.itt_ci95[1])}), about a tenth of the observational gap.`,
+    hbars([{label:"Observational: bridged vs not",value:SIM.naive_observational_in_control,color:"var(--faint)",lo:SIM.naive_ci95[0],hi:SIM.naive_ci95[1]},{label:"Randomized: per user who bridged",value:SIM.cace,color:"var(--exp)"},{label:"Randomized: everyone offered",value:SIM.itt_diff,color:"var(--exp)",lo:SIM.itt_ci95[0],hi:SIM.itt_ci95[1]}],{min:-0.05,max:0.45,labelW:230,ticks:[0,.1,.2,.3,.4],fmtV:v=>pp(v)}),
+    `Difference in week-5 value retention. ${fmt(SIM.n_treatment)} treated vs ${fmt(SIM.n_control)} control users who acted on an analysis; uptake ${pct(SIM.uptake_treatment,0)} vs ${pct(SIM.uptake_control,0)}. The observational row compares users inside the control arm. The test was underpowered: detecting +3 pp from this baseline needs about 4,000 users per arm.`)}
+</section>
+
+<section class="step" id="F">
+  <div class="stephead"><span class="letter">F</span><div><div class="kicker">Acquisition-mix example</div><h2>An apparent July retention decline disappears after segmenting acquisition mix</h2></div></div>
+  ${fig(OBS, `Week-2 retention fell to ${pct(jul[0].d7_all)} and ${pct(jul[1].d7_all)} for two July cohorts. Without paid social, those cohorts were ${pct(jul[0].d7_other)} and ${pct(jul[1].d7_other)}, in line with June (${rng(june.map(r=>r.d7_all))}).`,
+    lines([{color:"var(--ink)",values:MIX.map(r=>r.d7_all),width:2.6},{color:"var(--accent)",values:MIX.map(r=>r.d7_other)},{color:"var(--warn)",values:MIX.map(r=>r.d7_paid_social),dash:"5 4"}],MIX.map(r=>r.week.slice(5)),{min:.2,max:.32,step:.04,h:260}),
+    `Week-2 activity retention by signup week (axis starts at 20%). A paid-social campaign made up ${pct(jul[0].n_paid_social/jul[0].n,0)} and ${pct(jul[1].n_paid_social/jul[1].n,0)} of those cohorts, versus about ${pct(june.reduce((a,r)=>a+r.n_paid_social,0)/june.reduce((a,r)=>a+r.n,0),0)} in June. The change came from the acquisition mix.`,
+    `<div class="legend"><span><span class="sw" style="background:var(--ink)"></span>All signups</span><span><span class="sw" style="background:var(--accent)"></span>Excluding paid social</span><span><span class="sw" style="background:var(--warn)"></span>Paid social only</span></div>`)}
+</section>
+
+<section class="step" id="G">
+  <div class="stephead"><span class="letter">G</span><div><div class="kicker">Product recommendations</div><h2>What I would do at Skip</h2></div></div>
+  <span class="tag rec">Recommendation · to validate with real Skip data</span>
+  <ol class="recs">
+    <li><h3>Define activation as a meaningful outcome, reported by initial intent</h3><p>One definition (kept, used, published or submitted) measured separately per job. <a href="#A">A</a>, <a href="#B">B</a></p></li>
+    <li><h3>Instrument outcome completion and downstream action</h3><p>Server-side outcome events and an ID on every AI output, so "generated → kept → used" can be followed beyond clicks and feature visits. <a href="#A">A</a></p></li>
+    <li><h3>Test contextual bridges like Analyze → Cofounder with randomized experiments</h3><p>Treat observational gaps as hypotheses and size tests for small effects. <a href="#D">D</a>, <a href="#E">E</a></p></li>
+    <li><h3>Separate grant-event retention from broader product retention</h3><p>Report drawing returns as their own metric; judge funding by how many users go on to get value from the rest of Skip. <a href="#A">A</a>, <a href="#D">D</a></p></li>
+    <li><h3>Investigate whether a successful first outcome leads to a second valuable job</h3><p>The real-data version of the cross-feature question: which second job follows a first success, and whether it changes retention and conversion. <a href="#C">C</a></p></li>
+  </ol>
+</section>
+
+<footer>All figures are from a synthetic simulation built to test the method; they say nothing about Skip's actual users or performance. Full write-up, SQL and code in the accompanying repository (CASE_STUDY.md, EXECUTIVE_SUMMARY.md).</footer>`;
+document.getElementById("main").innerHTML = html;
+</script>

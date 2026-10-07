@@ -1,0 +1,21 @@
+{
+ "eligible_users": 2147,
+ "n_treatment": 1071,
+ "n_control": 1076,
+ "uptake_treatment": 0.5677,
+ "uptake_control": 0.3522,
+ "d30_value_treatment": 0.381,
+ "d30_value_control": 0.3504,
+ "itt_diff": 0.0306,
+ "itt_ci95": [
+  -0.0087,
+  0.0698
+ ],
+ "itt_p_value": 0.14126609287563818,
+ "cace": 0.1419,
+ "naive_observational_in_control": 0.3308,
+ "naive_ci95": [
+  0.2733,
+  0.3893
+ ]
+}

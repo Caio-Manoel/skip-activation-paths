@@ -1,0 +1,7 @@
+initial_intent,signups,reached_value_ever,p25_hours,median_hours,p75_hours,p90_hours,mean_hours_misleading
+analyze,1619,811,0.07,0.1,25.78,480.6,119.24
+ask,1944,1307,0.08,0.1,0.17,257.39,79.16
+create,4006,2223,0.07,0.1,2.81,312.63,90.23
+funding,6226,4412,0.08,0.13,29.19,286.21,90.17
+presence,2263,1052,0.05,0.07,1.5,379.28,99.53
+start,1572,904,0.05,0.07,0.12,123.89,65.02

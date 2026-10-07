@@ -1,0 +1,7 @@
+initial_intent,signups,pct_first_action,pct_activated_intent_7d,pct_activated_any_7d,universal_only_activated,share_of_universal_not_intent
+funding,6226,0.878,0.605,0.642,231.0,0.058
+create,4006,0.857,0.474,0.535,246.0,0.115
+presence,2263,0.877,0.392,0.475,188.0,0.175
+ask,1944,0.889,0.593,0.639,90.0,0.072
+analyze,1619,0.873,0.408,0.489,132.0,0.167
+start,1572,0.875,0.522,0.584,97.0,0.106

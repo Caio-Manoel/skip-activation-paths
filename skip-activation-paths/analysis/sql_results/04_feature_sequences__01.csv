@@ -1,0 +1,16 @@
+first_three,users,share_of_users,d30_observed,d30_value
+funding:start → funding:output → funding:value,3215,0.209,2950,0.147
+create:start → create:output → create:value,1628,0.106,1533,0.197
+cofounder:start → cofounder:output → cofounder:start,1302,0.085,1207,0.146
+create:start → create:output,651,0.042,619,0.0
+analyze:start → analyze:output → analyze:value,573,0.037,530,0.226
+funding:start,511,0.033,471,0.0
+website:output,476,0.031,456,0.0
+create:start → create:output → create:start,459,0.03,428,0.124
+funding:start → funding:value → funding:start,320,0.021,304,0.095
+business_plan:output,312,0.02,296,0.0
+funding:start → funding:output → funding:start,294,0.019,277,0.101
+analyze:start → analyze:output,277,0.018,254,0.0
+funding:start → funding:output,256,0.017,231,0.0
+cofounder:start → cofounder:output → cofounder:value,232,0.015,204,0.245
+business_plan:output → business_plan:value,231,0.015,211,0.019

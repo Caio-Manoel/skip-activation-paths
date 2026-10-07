@@ -1,0 +1,13 @@
+initial_intent,activated_intent_7d,users_d30_observed,d1_activity,d7_value,d30_value
+analyze,False,890,0.034,0.066,0.034
+analyze,True,612,0.235,0.281,0.227
+ask,False,729,0.037,0.044,0.033
+ask,True,1062,0.23,0.268,0.201
+create,False,2005,0.033,0.06,0.044
+create,True,1792,0.242,0.323,0.205
+funding,False,2259,0.006,0.042,0.028
+funding,True,3468,0.167,0.203,0.143
+presence,False,1301,0.042,0.042,0.031
+presence,True,818,0.175,0.209,0.177
+start,False,698,0.027,0.032,0.021
+start,True,761,0.11,0.146,0.116

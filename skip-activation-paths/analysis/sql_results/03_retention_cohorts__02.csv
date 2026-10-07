@@ -1,0 +1,7 @@
+initial_intent,users_d30_observed,d7_activity,d7_value,d30_activity,d30_value,value_share_of_d30_active
+analyze,1502,0.271,0.154,0.2,0.113,0.561
+ask,1791,0.339,0.177,0.241,0.132,0.55
+create,3797,0.304,0.184,0.222,0.12,0.542
+funding,5727,0.296,0.139,0.202,0.098,0.485
+presence,2119,0.223,0.106,0.16,0.087,0.544
+start,1459,0.156,0.091,0.106,0.071,0.665

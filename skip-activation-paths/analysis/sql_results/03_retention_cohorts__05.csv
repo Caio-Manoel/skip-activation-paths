@@ -1,0 +1,7 @@
+acquisition_channel,users_d30_observed,d30_value_raw,expected_from_intent_mix,within_intent_gap
+grant_listings,3186,0.088,0.098,-0.011
+paid_social,4334,0.089,0.11,-0.021
+organic_search,4172,0.106,0.102,0.004
+app_store,1758,0.107,0.105,0.002
+direct,1416,0.137,0.106,0.031
+referral_affiliate,1529,0.143,0.103,0.04
